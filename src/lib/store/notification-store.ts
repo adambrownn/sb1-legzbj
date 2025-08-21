@@ -16,8 +16,12 @@ interface NotificationState {
   addNotification: (notification: Omit<Notification, 'id' | 'read' | 'createdAt'>) => void;
   markAsRead: (id: string) => void;
   clearNotification: (id: string) => void;
+  clearAllRead: () => void;
   getUserNotifications: (userId: string) => Notification[];
 }
+
+// Simple ID generator
+const generateId = () => `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 export const useNotificationStore = create<NotificationState>()(
   persist(
@@ -26,9 +30,10 @@ export const useNotificationStore = create<NotificationState>()(
       addNotification: (notification) => {
         const newNotification = {
           ...notification,
-          id: crypto.randomUUID(),
+          id: generateId(),
           read: false,
           createdAt: new Date().toISOString(),
+          type: notification.type || 'info',
         };
         set((state) => ({
           notifications: [newNotification, ...state.notifications],
@@ -48,10 +53,15 @@ export const useNotificationStore = create<NotificationState>()(
           ),
         }));
       },
+      clearAllRead: () => {
+        set((state) => ({
+          notifications: state.notifications.filter(
+            (notification) => !notification.read
+          ),
+        }));
+      },
       getUserNotifications: (userId) => {
-        return get().notifications.filter(
-          (notification) => notification.userId === userId
-        );
+        return get().notifications.filter((notification) => notification.userId === userId);
       },
     }),
     {

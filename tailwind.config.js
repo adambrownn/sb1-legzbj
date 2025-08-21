@@ -4,24 +4,39 @@ export default {
   theme: {
     extend: {
       colors: {
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+          DEFAULT: 'var(--primary)',
+          hover: 'var(--primary-hover)',
+          light: 'var(--primary-light)',
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
+          DEFAULT: 'var(--secondary)',
+          hover: 'var(--secondary-hover)',
+          light: 'var(--secondary-light)',
+        },
+        text: {
+          DEFAULT: 'var(--text)',
+          muted: 'var(--text-muted)',
+        },
+        background: {
+          DEFAULT: 'var(--background)',
+          darker: 'var(--background-darker)',
         },
       },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+      keyframes: {
+        "fade-in": {
+          from: { opacity: 0 },
+          to: { opacity: 1 },
+        },
+      },
+      animation: {
+        "fade-in": "fade-in 0.2s ease-in-out",
+        "fade-in-80": "fade-in 0.8s ease-in-out",
       },
     },
   },

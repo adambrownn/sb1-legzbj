@@ -10,6 +10,8 @@ import { bookingSchema } from '@/lib/validations/booking';
 import { useBookingStore } from '@/lib/store/booking-store';
 import { useAuthStore } from '@/lib/store/auth-store';
 import type { PropertyDetails } from '@/lib/types/property';
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
 
 interface BookingFormProps {
   property: PropertyDetails;
@@ -30,11 +32,21 @@ export function BookingForm({
   const { user } = useAuthStore();
   const { addBooking } = useBookingStore();
 
+  const [filter, setFilter] = React.useState({
+    priceRange: [0, 1000],
+    guestCapacity: 1,
+  });
+
+  const handleFilterChange = (field: string, value: any) => {
+    setFilter((prev) => ({ ...prev, [field]: value }));
+  };
+
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
+    setValue,
   } = useForm({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
@@ -50,11 +62,36 @@ export function BookingForm({
   const checkOut = watch('checkOut');
   const guestCount = watch('guestCount');
 
+  const availableDates = [
+    { date: '2023-12-01', available: true },
+    { date: '2023-12-02', available: false },
+    // Add more dates as needed
+  ];
+
+  const isDateAvailable = (date: string) => {
+    const found = availableDates.find((d) => d.date === date);
+    return found ? found.available : false;
+  };
+
+  const renderAvailabilityTooltip = (date: string) => {
+    return isDateAvailable(date) ? 'Available' : 'Unavailable';
+  };
+
   const numberOfNights = checkIn && checkOut
     ? differenceInDays(parseISO(checkOut), parseISO(checkIn))
     : 0;
 
   const totalPrice = numberOfNights * property.price;
+
+  const handleDayClick = (day: Date) => {
+    const dateStr = format(day, 'yyyy-MM-dd');
+    if (isDateAvailable(dateStr)) {
+      setValue('checkIn', dateStr);
+      setValue('checkOut', dateStr);
+    } else {
+      toast.error('Selected date is unavailable');
+    }
+  };
 
   const onSubmit = async (data: any) => {
     if (!user) {
@@ -84,6 +121,48 @@ export function BookingForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
+        <DayPicker
+          mode="single"
+          selected={selectedDates.checkIn}
+          onSelect={handleDayClick}
+          modifiers={{
+            available: (date) => isDateAvailable(format(date, 'yyyy-MM-dd')),
+          }}
+          modifiersStyles={{
+            available: {
+              color: 'green',
+            },
+            disabled: {
+              color: 'red',
+            },
+          }}
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Price Range
+        </label>
+        <input
+          type="range"
+          min="0"
+          max="1000"
+          value={filter.priceRange}
+          onChange={(e) => handleFilterChange('priceRange', e.target.value)}
+        />
+        <span>{filter.priceRange}</span>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Guest Capacity
+        </label>
+        <input
+          type="number"
+          min="1"
+          value={filter.guestCapacity}
+          onChange={(e) => handleFilterChange('guestCapacity', e.target.value)}
+        />
+      </div>
+      <div>
         <label className="block text-sm font-medium text-gray-700">
           Number of Guests
         </label>
@@ -99,6 +178,32 @@ export function BookingForm({
             {errors.guestCount.message as string}
           </p>
         )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Check-In Date
+        </label>
+        <input
+          type="date"
+          {...register('checkIn', {
+            validate: (value) => isDateAvailable(value) || 'Date is unavailable',
+          })}
+        />
+        {errors.checkIn && <span>{errors.checkIn.message}</span>}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Check-Out Date
+        </label>
+        <input
+          type="date"
+          {...register('checkOut', {
+            validate: (value) => isDateAvailable(value) || 'Date is unavailable',
+          })}
+        />
+        {errors.checkOut && <span>{errors.checkOut.message}</span>}
       </div>
 
       <div>

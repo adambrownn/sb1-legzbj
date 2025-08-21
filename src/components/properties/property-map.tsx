@@ -1,97 +1,98 @@
 import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { Filter } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
+import { Icon, LatLngExpression } from 'leaflet';
+import type { PropertyLocation, NearbyPlace } from '@/types/property';
+import { cn } from '@/lib/utils';
 import 'leaflet/dist/leaflet.css';
-import type { PropertyLocation } from '@/lib/types/property';
 
 interface PropertyMapProps {
   location: PropertyLocation;
-  nearbyAttractions?: Array<{
-    name: string;
-    location: PropertyLocation;
-    type: string;
-    distance: number;
-    rating?: number;
-    reviews?: number;
-  }>;
+  nearbyPlaces?: NearbyPlace[];
+  className?: string;
 }
 
-export function PropertyMap({ location, nearbyAttractions = [] }: PropertyMapProps) {
-  const [selectedType, setSelectedType] = React.useState<string | null>(null);
-  const attractionTypes = Array.from(
-    new Set(nearbyAttractions.map((a) => a.type))
-  );
+const customIcon = new Icon({
+  iconUrl: '/markers/property-marker.svg',
+  iconSize: [35, 35],
+  iconAnchor: [17, 35],
+  popupAnchor: [0, -35],
+});
 
-  const filteredAttractions = selectedType
-    ? nearbyAttractions.filter((a) => a.type === selectedType)
-    : nearbyAttractions;
+const placeIcon = new Icon({
+  iconUrl: '/markers/place-marker.svg',
+  iconSize: [25, 25],
+  iconAnchor: [12, 25],
+  popupAnchor: [0, -25],
+});
+
+export function PropertyMap({ location, nearbyPlaces = [], className }: PropertyMapProps) {
+  const center: LatLngExpression = [location.latitude, location.longitude];
+  const walkingRadius = 1000; // 1km radius
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        <Button
-          variant={selectedType === null ? 'primary' : 'outline'}
-          size="sm"
-          onClick={() => setSelectedType(null)}
-        >
-          All
-        </Button>
-        {attractionTypes.map((type) => (
-          <Button
-            key={type}
-            variant={selectedType === type ? 'primary' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedType(type)}
-          >
-            {type}
-          </Button>
-        ))}
-      </div>
+    <div className={cn('relative h-[400px] w-full rounded-lg overflow-hidden', className)}>
+      <MapContainer
+        center={center}
+        zoom={15}
+        className="h-full w-full"
+        scrollWheelZoom={false}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
 
-      <div className="h-[400px] overflow-hidden rounded-lg">
-        <MapContainer
-          center={[location.latitude, location.longitude]}
-          zoom={14}
-          className="h-full w-full"
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          
-          <Marker position={[location.latitude, location.longitude]}>
+        {/* Property Marker */}
+        <Marker position={center} icon={customIcon}>
+          <Popup>
+            <div className="p-2">
+              <h3 className="font-semibold">{location.address}</h3>
+              {location.description && (
+                <p className="mt-1 text-sm text-gray-600">{location.description}</p>
+              )}
+            </div>
+          </Popup>
+        </Marker>
+
+        {/* Nearby Places Markers */}
+        {nearbyPlaces.map((place) => (
+          <Marker key={place.id} position={[place.latitude, place.longitude]} icon={placeIcon}>
             <Popup>
               <div className="p-2">
-                <h3 className="font-medium">Property Location</h3>
-                <p className="text-sm text-gray-600">{location.address}</p>
+                <h3 className="font-semibold">{place.name}</h3>
+                {place.description && (
+                  <p className="mt-1 text-sm text-gray-600">{place.description}</p>
+                )}
               </div>
             </Popup>
           </Marker>
+        ))}
 
-          {filteredAttractions.map((attraction, index) => (
-            <Marker
-              key={index}
-              position={[attraction.location.latitude, attraction.location.longitude]}
-            >
-              <Popup>
-                <div className="p-2">
-                  <h3 className="font-medium">{attraction.name}</h3>
-                  <p className="text-sm text-gray-600">{attraction.type}</p>
-                  {attraction.rating && (
-                    <p className="text-sm text-gray-600">
-                      Rating: {attraction.rating}/5
-                      {attraction.reviews && ` (${attraction.reviews} reviews)`}
-                    </p>
-                  )}
-                  <p className="text-sm text-gray-600">
-                    {attraction.distance.toFixed(1)} km away
-                  </p>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
+        {/* Walking Radius Circle */}
+        <Circle
+          center={center}
+          radius={walkingRadius}
+          pathOptions={{ color: 'blue', fillColor: 'blue', fillOpacity: 0.1 }}
+        />
+      </MapContainer>
+
+      {/* Legend */}
+      <div className="absolute bottom-4 right-4 z-[400] rounded-lg bg-white p-3 shadow-lg">
+        <h4 className="mb-2 text-sm font-semibold">Legend</h4>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <img src="/markers/property-marker.svg" alt="Property" className="h-5 w-5" />
+            <span className="text-sm">Property Location</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <img src="/markers/place-marker.svg" alt="Nearby Place" className="h-4 w-4" />
+            <span className="text-sm">Nearby Places</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded-full bg-blue-500/20 ring-1 ring-blue-500" />
+            <span className="text-sm">Walking Distance (1km)</span>
+          </div>
+        </div>
       </div>
     </div>
   );

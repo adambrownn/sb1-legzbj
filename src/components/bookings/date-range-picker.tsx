@@ -1,135 +1,135 @@
-import React from 'react';
-import { format, addDays, isWithinInterval, isBefore, isAfter } from 'date-fns';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
-import type { Property } from '@/lib/types/property';
+import React, { useEffect } from 'react';
+import { format, isWithinInterval, parseISO } from 'date-fns';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { DayPicker } from 'react-day-picker';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { AvailabilityService } from '@/lib/services/availability.service';
+import { useToast } from '@/hooks/use-toast';
 
 interface DateRangePickerProps {
-  property: Property;
-  onSelect: (dates: { checkIn: Date; checkOut: Date }) => void;
+  propertyId: string;
+  selectedDates: {
+    checkIn: Date | null;
+    checkOut: Date | null;
+  };
+  onChange: (dates: { checkIn: Date | null; checkOut: Date | null }) => void;
+  error?: string;
 }
 
-export function DateRangePicker({ property, onSelect }: DateRangePickerProps) {
-  const [currentMonth, setCurrentMonth] = React.useState(new Date());
-  const [selectedRange, setSelectedRange] = React.useState<{
-    start?: Date;
-    end?: Date;
-  }>({});
+export function DateRangePicker({
+  propertyId,
+  selectedDates,
+  onChange,
+  error,
+}: DateRangePickerProps) {
+  const { toast } = useToast();
+  const availabilityService = AvailabilityService.getInstance();
 
-  const handleDateClick = (date: Date) => {
-    if (!selectedRange.start || (selectedRange.start && selectedRange.end)) {
-      setSelectedRange({ start: date });
-    } else {
-      if (isBefore(date, selectedRange.start)) {
-        setSelectedRange({ start: date });
-      } else {
-        setSelectedRange({ ...selectedRange, end: date });
-        onSelect({
-          checkIn: selectedRange.start,
-          checkOut: date,
-        });
-      }
-    }
-  };
+  useEffect(() => {
+    // Subscribe to real-time calendar updates
+    availabilityService.subscribeToPropertyUpdates(propertyId);
 
-  const isDateDisabled = (date: Date) => {
-    return property.availability.some((block) =>
-      isWithinInterval(date, {
-        start: new Date(block.startDate),
-        end: new Date(block.endDate),
-      })
-    );
-  };
+    // Clean up subscription on unmount
+    return () => {
+      availabilityService.unsubscribeFromPropertyUpdates(propertyId);
+    };
+  }, [propertyId]);
 
-  const isDateInRange = (date: Date) => {
-    if (!selectedRange.start || !selectedRange.end) return false;
-    return (
-      isAfter(date, selectedRange.start) &&
-      isBefore(date, selectedRange.end)
-    );
-  };
+  const handleDateSelect = async (date: Date | undefined) => {
+    if (!date) return;
 
-  const renderCalendarDays = () => {
-    const days = [];
-    const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
-    const end = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
-
-    // Add empty cells for days before the first of the month
-    for (let i = 0; i < start.getDay(); i++) {
-      days.push(<div key={`empty-${i}`} />);
-    }
-
-    // Add days of the month
-    for (let day = 1; day <= end.getDate(); day++) {
-      const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-      const isDisabled = isDateDisabled(date);
-      const isSelected =
-        selectedRange.start?.getTime() === date.getTime() ||
-        selectedRange.end?.getTime() === date.getTime();
-      const isInRange = isDateInRange(date);
-
-      days.push(
-        <button
-          key={date.toISOString()}
-          onClick={() => !isDisabled && handleDateClick(date)}
-          disabled={isDisabled}
-          className={`h-10 w-10 rounded-full ${
-            isSelected
-              ? 'bg-blue-600 text-white'
-              : isInRange
-              ? 'bg-blue-100'
-              : isDisabled
-              ? 'cursor-not-allowed bg-gray-100 text-gray-400'
-              : 'hover:bg-gray-100'
-          }`}
-        >
-          {day}
-        </button>
+    try {
+      // Check if the selected date is available
+      const isAvailable = await availabilityService.isAvailable(
+        propertyId,
+        format(date, 'yyyy-MM-dd'),
+        format(date, 'yyyy-MM-dd'),
+        Intl.DateTimeFormat().resolvedOptions().timeZone
       );
-    }
 
-    return days;
+      if (!isAvailable) {
+        toast({
+          title: 'Date Unavailable',
+          description: 'The selected date is not available for booking.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Update selected dates based on current selection state
+      if (!selectedDates.checkIn || (selectedDates.checkIn && selectedDates.checkOut)) {
+        // Start new selection
+        onChange({ checkIn: date, checkOut: null });
+      } else {
+        // Complete the range
+        if (date < selectedDates.checkIn) {
+          onChange({ checkIn: date, checkOut: selectedDates.checkIn });
+        } else {
+          onChange({ checkIn: selectedDates.checkIn, checkOut: date });
+        }
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to check date availability. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <button
-          onClick={() =>
-            setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)))
-          }
-          className="rounded-full p-1 hover:bg-gray-100"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <div className="flex items-center">
-          <CalendarIcon className="mr-2 h-5 w-5 text-gray-500" />
-          <span className="font-medium">
-            {format(currentMonth, 'MMMM yyyy')}
-          </span>
-        </div>
-        <button
-          onClick={() =>
-            setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)))
-          }
-          className="rounded-full p-1 hover:bg-gray-100"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
-      </div>
-
-      <div className="grid grid-cols-7 gap-1 text-center text-sm">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-          <div key={day} className="py-2 font-medium text-gray-500">
-            {day}
-          </div>
-        ))}
-        {renderCalendarDays()}
-      </div>
-
-      {selectedRange.start && !selectedRange.end && (
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Select your check-out date
-        </p>
+    <div className="w-full">
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className={cn(
+              "w-full justify-start text-left font-normal",
+              !selectedDates.checkIn && "text-muted-foreground",
+              error && "border-red-500"
+            )}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {selectedDates.checkIn ? (
+              selectedDates.checkOut ? (
+                <>
+                  {format(selectedDates.checkIn, "PPP")} -{" "}
+                  {format(selectedDates.checkOut, "PPP")}
+                </>
+              ) : (
+                format(selectedDates.checkIn, "PPP")
+              )
+            ) : (
+              <span>Select dates</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="range"
+            defaultMonth={selectedDates.checkIn || new Date()}
+            selected={{
+              from: selectedDates.checkIn || undefined,
+              to: selectedDates.checkOut || undefined,
+            }}
+            onSelect={(range) => {
+              if (range?.from) {
+                handleDateSelect(range.from);
+              }
+              if (range?.to) {
+                handleDateSelect(range.to);
+              }
+            }}
+            numberOfMonths={2}
+            disabled={{ before: new Date() }}
+          />
+        </PopoverContent>
+      </Popover>
+      {error && (
+        <p className="mt-1 text-sm text-red-500">{error}</p>
       )}
     </div>
   );

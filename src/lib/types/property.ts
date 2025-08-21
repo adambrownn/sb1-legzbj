@@ -12,6 +12,12 @@ export interface PropertyAvailability {
   isBooked: boolean;
 }
 
+export interface Property {
+  id: string;
+  name: string;
+  details?: PropertyDetails;
+}
+
 export interface PropertyDetails {
   id: string;
   hostId: string;

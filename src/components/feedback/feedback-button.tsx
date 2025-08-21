@@ -11,10 +11,11 @@ export function FeedbackButton() {
     <>
       <Button
         onClick={() => setShowDialog(true)}
-        className="fixed bottom-4 right-4 gap-2 shadow-lg"
+        className="fixed bottom-24 right-4 flex items-center gap-2 px-4 py-2 shadow-lg"
+        title="Send Feedback"
       >
-        <MessageSquarePlus className="h-4 w-4" />
-        Send Feedback
+        <MessageSquarePlus className="h-5 w-5" />
+        <span className="text-sm">Feedback</span>
       </Button>
 
       <Dialog

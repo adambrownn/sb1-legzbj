@@ -1,96 +1,155 @@
-import React from 'react';
-import { Search, Sliders } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { SearchFilterPanel } from './search-filter-panel';
-import { LocationSuggestions } from './location-suggestions';
-import { useDebounce } from '@/lib/hooks/use-debounce';
-import type { LocationSuggestion, SearchFilters } from '@/lib/types/search';
+import React from "react";
+import { Search } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { PromotionalProperty } from "@/types/promotion";
+import { MOCK_PROMOTIONS } from "@/data/promotions";
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 interface SearchBarProps {
-  onSearch: (query: string, filters: SearchFilters) => void;
+  onSearch: (query: string, checkInDate: Date | null, checkOutDate: Date | null, guests: number) => void;
   placeholder?: string;
   className?: string;
 }
 
+interface SearchSuggestion {
+  id: string;
+  text: string;
+  type: 'property' | 'location';
+}
+
 export function SearchBar({
   onSearch,
-  placeholder = 'Search for places...',
-  className = '',
+  placeholder = "Search for places...",
+  className = "",
 }: SearchBarProps) {
-  const [query, setQuery] = React.useState('');
-  const [showFilters, setShowFilters] = React.useState(false);
-  const [filters, setFilters] = React.useState<SearchFilters>({});
-  const [suggestions, setSuggestions] = React.useState<LocationSuggestion[]>([]);
-  const debouncedSearch = useDebounce((value: string) => {
-    onSearch(value, filters);
-  }, 300);
+  const [query, setQuery] = React.useState("");
+  const [checkInDate, setCheckInDate] = React.useState<Date | null>(null);
+  const [checkOutDate, setCheckOutDate] = React.useState<Date | null>(null);
+  const [guests, setGuests] = React.useState('');
+  const [showSuggestions, setShowSuggestions] = React.useState(false);
+  const suggestionRef = React.useRef<HTMLDivElement>(null);
 
-  const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setQuery(value);
-    
-    if (value.length >= 2) {
-      // Simulate API call for location suggestions
-      const mockSuggestions: LocationSuggestion[] = [
-        { id: '1', name: 'New York', type: 'city' },
-        { id: '2', name: 'Los Angeles', type: 'city' },
-        { id: '3', name: 'California', type: 'region' },
-      ].filter(s => 
-        s.name.toLowerCase().includes(value.toLowerCase())
-      );
-      setSuggestions(mockSuggestions);
-    } else {
-      setSuggestions([]);
-    }
-    
-    debouncedSearch(value);
+  // In a real app, this would be an API call
+  const { data: properties } = useQuery<PromotionalProperty[]>({
+    queryKey: ["properties"],
+    queryFn: () => Promise.resolve(MOCK_PROMOTIONS),
+  });
+
+  const getSuggestions = (searchQuery: string): SearchSuggestion[] => {
+    if (!searchQuery.trim() || !properties) return [];
+
+    const suggestions: SearchSuggestion[] = [];
+    const lowercaseQuery = searchQuery.toLowerCase();
+
+    // Add property name suggestions
+    properties.forEach((property) => {
+      if (property.name.toLowerCase().includes(lowercaseQuery)) {
+        suggestions.push({
+          id: `property-${property.id}`,
+          text: property.name,
+          type: 'property'
+        });
+      }
+      
+      // Add location suggestions
+      if (property.location.toLowerCase().includes(lowercaseQuery)) {
+        const existingLocation = suggestions.find(
+          (s) => s.type === 'location' && s.text === property.location
+        );
+        if (!existingLocation) {
+          suggestions.push({
+            id: `location-${property.id}`,
+            text: property.location,
+            type: 'location'
+          });
+        }
+      }
+    });
+
+    return suggestions.slice(0, 5); // Limit to 5 suggestions
   };
 
-  const handleSuggestionSelect = (suggestion: LocationSuggestion) => {
-    setQuery(suggestion.name);
-    setSuggestions([]);
-    onSearch(suggestion.name, filters);
+  const saveSearchPreference = (searchQuery: string) => {
+    localStorage.setItem('lastSearch', searchQuery);
   };
 
-  const handleFiltersChange = (newFilters: SearchFilters) => {
-    setFilters(newFilters);
-    onSearch(query, newFilters);
+  const handleSearch = () => {
+    saveSearchPreference(query);
+    onSearch(query, checkInDate, checkOutDate, guests === '' ? 1 : Number(guests));
+    setShowSuggestions(false);
+  };
+
+  const handleSearchClick = () => {
+    onSearch(query, checkInDate, checkOutDate, guests === '' ? 1 : Number(guests));
+  };
+
+  const handleGuestChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setGuests(value === '' ? '' : Number(value));
   };
 
   return (
-    <div className={`relative ${className}`}>
-      <div className="relative flex items-center gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            value={query}
-            onChange={handleQueryChange}
-            placeholder={placeholder}
-            className="h-12 w-full rounded-full border border-gray-200 bg-white pl-12 pr-4 text-base placeholder:text-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 sm:h-14 sm:text-lg"
-          />
-          <LocationSuggestions
-            suggestions={suggestions}
-            onSelect={handleSuggestionSelect}
-          />
-        </div>
-        <Button
-          variant="outline"
-          onClick={() => setShowFilters(!showFilters)}
-          className="h-12 gap-2 rounded-full border-gray-200 sm:h-14"
-        >
-          <Sliders className="h-4 w-4" />
-          Filters
-        </Button>
+    <div className={`search-bar ${className} flex items-center justify-between bg-white rounded-full shadow-md overflow-hidden`}>  
+      <div className="flex items-center border-r px-4">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setShowSuggestions(true);
+          }}
+          onFocus={() => setShowSuggestions(true)}
+          placeholder="Destination"
+          className="w-full p-2 text-sm focus:outline-none"
+        />
       </div>
-
-      {showFilters && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2">
-          <SearchFilterPanel
-            filters={filters}
-            onChange={handleFiltersChange}
-            onClose={() => setShowFilters(false)}
-          />
+      <div className="flex items-center border-r px-4">
+        <DatePicker
+          selected={checkInDate}
+          onChange={(date) => setCheckInDate(date)}
+          placeholderText="Check-in"
+          className="w-full p-2 text-sm focus:outline-none"
+        />
+      </div>
+      <div className="flex items-center border-r px-4">
+        <DatePicker
+          selected={checkOutDate}
+          onChange={(date) => setCheckOutDate(date)}
+          placeholderText="Check-out"
+          className="w-full p-2 text-sm focus:outline-none"
+        />
+      </div>
+      <div className="flex items-center px-4">
+        <input
+          type="number"
+          value={guests}
+          onChange={handleGuestChange}
+          min="1"
+          placeholder="Guests"
+          className="w-full p-2 text-sm focus:outline-none"
+        />
+      </div>
+      <button
+        onClick={handleSearchClick}
+        className="p-2 bg-blue-500 text-white rounded-full mr-1"
+      >
+        <Search className="h-4 w-4" />
+      </button>
+      {showSuggestions && query && (
+        <div className="absolute left-0 right-0 z-10 mt-1 max-h-40 overflow-y-auto rounded-md bg-white shadow-lg">
+          {getSuggestions(query).map((suggestion) => (
+            <div
+              key={suggestion.id}
+              className="cursor-pointer px-4 py-2 hover:bg-gray-100"
+              onClick={() => {
+                setQuery(suggestion.text);
+                handleSearch();
+              }}
+            >
+              {suggestion.text}
+            </div>
+          ))}
         </div>
       )}
     </div>

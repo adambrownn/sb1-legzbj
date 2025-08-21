@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1",
+    "name": "Luxury Villa",
+    "location": "North India",
+    "price": 250,
+    "amenities": ["Pool", "WiFi", "Parking"],
+    "description": "A beautiful luxury villa with stunning views."
+  },
+  {
+    "id": "2",
+    "name": "Cozy Cottage",
+    "location": "North India",
+    "price": 150,
+    "amenities": ["Garden", "Fireplace"],
+    "description": "A cozy cottage perfect for a romantic getaway."
+  }
+]

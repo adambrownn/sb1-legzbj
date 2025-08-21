@@ -1,110 +1,101 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Star, Users, Bed, Bath } from 'lucide-react';
-import { Loader } from '@/components/ui/loader';
+import { ChevronRight } from 'lucide-react';
 import { usePropertyStore } from '@/lib/store/property-store';
-import { cn } from '@/lib/utils';
+import { useCurrencyStore } from '@/lib/store/currency-store';
+import { PropertyCard } from './property-card';
+import { Button } from '@/components/ui/button';
 
 export function FeaturedProperties() {
   const navigate = useNavigate();
   const { properties, isLoading, error, loadProperties } = usePropertyStore();
-  const [hoveredId, setHoveredId] = React.useState<string | null>(null);
+  const { formatPrice } = useCurrencyStore();
 
   React.useEffect(() => {
     loadProperties();
   }, [loadProperties]);
 
-  const handlePropertyClick = (propertyId: string) => {
-    navigate(`/properties/${propertyId}`);
-  };
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="h-8 w-48 animate-pulse rounded-lg bg-gray-200" />
+          <div className="h-8 w-24 animate-pulse rounded-lg bg-gray-200" />
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="animate-pulse rounded-xl bg-gray-100 p-4">
+              <div className="mb-4 h-48 w-full rounded-xl bg-gray-200" />
+              <div className="space-y-3">
+                <div className="h-6 w-3/4 rounded bg-gray-200" />
+                <div className="h-4 w-1/2 rounded bg-gray-200" />
+                <div className="flex justify-between">
+                  <div className="h-4 w-1/4 rounded bg-gray-200" />
+                  <div className="h-4 w-1/4 rounded bg-gray-200" />
+                  <div className="h-4 w-1/4 rounded bg-gray-200" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     return (
-      <div className="rounded-lg border-2 border-dashed border-gray-300 p-8 text-center">
-        <p className="text-gray-600">{error}</p>
+      <div className="rounded-lg bg-red-50 p-4 text-center text-red-500">
+        <p className="font-medium">Failed to load featured properties</p>
+        <Button
+          variant="ghost"
+          className="mt-2 text-red-600"
+          onClick={() => loadProperties()}
+        >
+          Try Again
+        </Button>
       </div>
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader className="h-8 w-8 text-blue-600" />
-      </div>
-    );
-  }
-
-  if (properties.length === 0) {
-    return (
-      <div className="rounded-lg border-2 border-dashed border-gray-300 p-8 text-center">
-        <p className="text-gray-600">No properties found.</p>
-      </div>
-    );
-  }
+  // Get featured properties (first 3 with highest rating)
+  const featuredProperties = properties
+    .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+    .slice(0, 3);
 
   return (
-    <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-      {properties.map((property) => (
-        <div
-          key={property.id}
-          onClick={() => handlePropertyClick(property.id)}
-          onMouseEnter={() => setHoveredId(property.id)}
-          onMouseLeave={() => setHoveredId(null)}
-          className={cn(
-            "group relative cursor-pointer overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300",
-            hoveredId === property.id ? "scale-[1.02] shadow-xl" : "hover:shadow-lg"
-          )}
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold text-gray-900">Featured Properties</h2>
+        <Button
+          variant="ghost"
+          className="text-blue-600"
+          onClick={() => navigate('/properties')}
         >
-          {/* Image Container */}
-          <div className="relative h-48 overflow-hidden">
-            <img
-              src={property.images[0]}
-              alt={property.title}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+          View All
+          <ChevronRight className="ml-1 h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {featuredProperties.map((property) => (
+          <div
+            key={property.id}
+            className="cursor-pointer"
+            onClick={() => navigate(`/properties/${property.id}`)}
+          >
+            <PropertyCard
+              property={property}
+              onEdit={(property) => {
+                // Handle edit
+              }}
+              onDelete={(id) => {
+                // Handle delete
+              }}
+              isFeatured={true}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           </div>
-
-          {/* Content */}
-          <div className="p-6">
-            <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600">
-              {property.title}
-            </h3>
-            
-            <div className="mt-2 flex items-center text-gray-500">
-              <MapPin className="mr-2 h-4 w-4" />
-              {property.location}
-            </div>
-
-            {/* Property Details */}
-            <div className="mt-4 flex items-center gap-4 text-gray-500">
-              <div className="flex items-center">
-                <Users className="mr-1 h-4 w-4" />
-                <span>{property.maxGuests} guests</span>
-              </div>
-              <div className="flex items-center">
-                <Bed className="mr-1 h-4 w-4" />
-                <span>{property.bedrooms} beds</span>
-              </div>
-              <div className="flex items-center">
-                <Bath className="mr-1 h-4 w-4" />
-                <span>{property.bathrooms} baths</span>
-              </div>
-            </div>
-
-            {/* Price */}
-            <div className="mt-4 flex items-center justify-between">
-              <div className="text-right">
-                <span className="text-lg font-bold text-gray-900">${property.price}</span>
-                <span className="text-gray-500">/night</span>
-              </div>
-            </div>
-
-            {/* Hover Overlay */}
-            <div className="absolute inset-x-0 bottom-0 h-1 bg-blue-600 transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100" />
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

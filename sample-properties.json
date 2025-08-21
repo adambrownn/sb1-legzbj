@@ -1,0 +1,402 @@
+[
+  {
+    "id": 1,
+    "name": "Cozy Cottage",
+    "location": "Shimla, Himachal Pradesh",
+    "price": 1200,
+    "amenities": ["WiFi", "Parking", "Heating"],
+    "description": "A cozy cottage in the hills of Shimla."
+  },
+  {
+    "id": 2,
+    "name": "Luxury Villa",
+    "location": "Manali, Himachal Pradesh",
+    "price": 3000,
+    "amenities": ["Pool", "WiFi", "Spa"],
+    "description": "A luxurious villa with stunning views of the mountains."
+  },
+  {
+    "id": 3,
+    "name": "Heritage Home",
+    "location": "Jaipur, Rajasthan",
+    "price": 1500,
+    "amenities": ["WiFi", "Garden", "Air Conditioning"],
+    "description": "A heritage home with traditional Rajasthani architecture."
+  },
+  {
+    "id": 4,
+    "name": "Modern Apartment",
+    "location": "Chandigarh, Punjab",
+    "price": 2000,
+    "amenities": ["WiFi", "Gym", "Balcony"],
+    "description": "A modern apartment in the heart of Chandigarh."
+  },
+  {
+    "id": 5,
+    "name": "Riverside Retreat",
+    "location": "Rishikesh, Uttarakhand",
+    "price": 1800,
+    "amenities": ["WiFi", "Yoga Studio", "River View"],
+    "description": "A serene retreat by the river in Rishikesh."
+  },
+  {
+    "id": 6,
+    "name": "Mountain View Lodge",
+    "location": "Nainital, Uttarakhand",
+    "price": 2500,
+    "amenities": ["WiFi", "Fireplace", "Mountain View"],
+    "description": "A lodge with breathtaking mountain views in Nainital."
+  },
+  {
+    "id": 7,
+    "name": "Desert Camp",
+    "location": "Jaisalmer, Rajasthan",
+    "price": 1000,
+    "amenities": ["WiFi", "Camel Safari", "Cultural Shows"],
+    "description": "An authentic desert camping experience in Jaisalmer."
+  },
+  {
+    "id": 8,
+    "name": "City Center Flat",
+    "location": "Lucknow, Uttar Pradesh",
+    "price": 2200,
+    "amenities": ["WiFi", "Gym", "24/7 Security"],
+    "description": "A comfortable flat in the city center of Lucknow."
+  },
+  {
+    "id": 9,
+    "name": "Hilltop Bungalow",
+    "location": "Mussoorie, Uttarakhand",
+    "price": 2700,
+    "amenities": ["WiFi", "Garden", "Hill View"],
+    "description": "A charming bungalow on the hills of Mussoorie."
+  },
+  {
+    "id": 10,
+    "name": "Lake House",
+    "location": "Udaipur, Rajasthan",
+    "price": 3200,
+    "amenities": ["WiFi", "Lake View", "Boat Access"],
+    "description": "A beautiful house by the lake in Udaipur."
+  },
+  {
+    "id": 11,
+    "name": "Forest Cabin",
+    "location": "Dehradun, Uttarakhand",
+    "price": 1400,
+    "amenities": ["WiFi", "Fireplace", "Forest View"],
+    "description": "A peaceful cabin in the woods of Dehradun."
+  },
+  {
+    "id": 12,
+    "name": "Palace Suite",
+    "location": "Udaipur, Rajasthan",
+    "price": 5000,
+    "amenities": ["WiFi", "Pool", "Royal Decor"],
+    "description": "A royal suite in a historic palace in Udaipur."
+  },
+  {
+    "id": 13,
+    "name": "Beachfront Villa",
+    "location": "Diu, Daman and Diu",
+    "price": 3500,
+    "amenities": ["WiFi", "Beach Access", "Sea View"],
+    "description": "A villa right on the beach in Diu."
+  },
+  {
+    "id": 14,
+    "name": "Hilltop Resort",
+    "location": "Shimla, Himachal Pradesh",
+    "price": 2800,
+    "amenities": ["WiFi", "Spa", "Mountain View"],
+    "description": "A resort with stunning views in Shimla."
+  },
+  {
+    "id": 15,
+    "name": "City Loft",
+    "location": "Delhi, Delhi",
+    "price": 2500,
+    "amenities": ["WiFi", "Gym", "City View"],
+    "description": "A modern loft in the heart of Delhi."
+  },
+  {
+    "id": 16,
+    "name": "Cultural Homestay",
+    "location": "Varanasi, Uttar Pradesh",
+    "price": 1300,
+    "amenities": ["WiFi", "Cultural Tours", "River View"],
+    "description": "A homestay offering cultural experiences in Varanasi."
+  },
+  {
+    "id": 17,
+    "name": "Eco Lodge",
+    "location": "Ranikhet, Uttarakhand",
+    "price": 1600,
+    "amenities": ["WiFi", "Eco-Friendly", "Mountain View"],
+    "description": "An eco-friendly lodge in the hills of Ranikhet."
+  },
+  {
+    "id": 18,
+    "name": "Heritage Haveli",
+    "location": "Jodhpur, Rajasthan",
+    "price": 1900,
+    "amenities": ["WiFi", "Garden", "Traditional Decor"],
+    "description": "A haveli with rich heritage in Jodhpur."
+  },
+  {
+    "id": 19,
+    "name": "Lakeview Apartment",
+    "location": "Nainital, Uttarakhand",
+    "price": 2100,
+    "amenities": ["WiFi", "Lake View", "Balcony"],
+    "description": "An apartment with a view of the lake in Nainital."
+  },
+  {
+    "id": 20,
+    "name": "Boutique Hotel",
+    "location": "Agra, Uttar Pradesh",
+    "price": 2300,
+    "amenities": ["WiFi", "Restaurant", "Taj Mahal View"],
+    "description": "A boutique hotel with a view of the Taj Mahal in Agra."
+  },
+  {
+    "id": 21,
+    "name": "Garden Villa",
+    "location": "Amritsar, Punjab",
+    "price": 2400,
+    "amenities": ["WiFi", "Garden", "Pet Friendly"],
+    "description": "A villa with a beautiful garden in Amritsar."
+  },
+  {
+    "id": 22,
+    "name": "Hill Station Resort",
+    "location": "Dharamshala, Himachal Pradesh",
+    "price": 2600,
+    "amenities": ["WiFi", "Spa", "Mountain View"],
+    "description": "A resort in the serene hills of Dharamshala."
+  },
+  {
+    "id": 23,
+    "name": "Urban Studio",
+    "location": "Gurgaon, Haryana",
+    "price": 1800,
+    "amenities": ["WiFi", "Gym", "City View"],
+    "description": "A modern studio in the bustling city of Gurgaon."
+  },
+  {
+    "id": 24,
+    "name": "Riverside Cottage",
+    "location": "Haridwar, Uttarakhand",
+    "price": 1500,
+    "amenities": ["WiFi", "River View", "Yoga Studio"],
+    "description": "A cottage by the river in Haridwar."
+  },
+  {
+    "id": 25,
+    "name": "Luxury Tent",
+    "location": "Pushkar, Rajasthan",
+    "price": 2000,
+    "amenities": ["WiFi", "Camel Safari", "Cultural Shows"],
+    "description": "A luxury tent experience in the deserts of Pushkar."
+  },
+  {
+    "id": 26,
+    "name": "Mountain Cabin",
+    "location": "Kullu, Himachal Pradesh",
+    "price": 1750,
+    "amenities": ["WiFi", "Fireplace", "Mountain View"],
+    "description": "A cozy cabin in the mountains of Kullu."
+  },
+  {
+    "id": 27,
+    "name": "City Hotel",
+    "location": "Chandigarh, Punjab",
+    "price": 2200,
+    "amenities": ["WiFi", "Restaurant", "City Center"],
+    "description": "A hotel located in the city center of Chandigarh."
+  },
+  {
+    "id": 28,
+    "name": "Rural Retreat",
+    "location": "Alwar, Rajasthan",
+    "price": 1450,
+    "amenities": ["WiFi", "Garden", "Pet Friendly"],
+    "description": "A retreat in the rural areas of Alwar."
+  },
+  {
+    "id": 29,
+    "name": "Luxury Bungalow",
+    "location": "Shimla, Himachal Pradesh",
+    "price": 3100,
+    "amenities": ["WiFi", "Pool", "Mountain View"],
+    "description": "A luxury bungalow with mountain views in Shimla."
+  },
+  {
+    "id": 30,
+    "name": "Beach House",
+    "location": "Diu, Daman and Diu",
+    "price": 3400,
+    "amenities": ["WiFi", "Beach Access", "Sea View"],
+    "description": "A house right on the beach in Diu."
+  },
+  {
+    "id": 31,
+    "name": "Cottage in the Woods",
+    "location": "Manali, Himachal Pradesh",
+    "price": 1600,
+    "amenities": ["WiFi", "Fireplace", "Forest View"],
+    "description": "A quaint cottage in the woods of Manali."
+  },
+  {
+    "id": 32,
+    "name": "Penthouse Suite",
+    "location": "Jaipur, Rajasthan",
+    "price": 4500,
+    "amenities": ["WiFi", "Pool", "City View"],
+    "description": "A luxurious penthouse suite in Jaipur."
+  },
+  {
+    "id": 33,
+    "name": "Farmhouse",
+    "location": "Ludhiana, Punjab",
+    "price": 1900,
+    "amenities": ["WiFi", "Garden", "Pet Friendly"],
+    "description": "A spacious farmhouse in the outskirts of Ludhiana."
+  },
+  {
+    "id": 34,
+    "name": "Seaside Villa",
+    "location": "Daman, Daman and Diu",
+    "price": 3200,
+    "amenities": ["WiFi", "Beach Access", "Sea View"],
+    "description": "A villa with direct access to the beach in Daman."
+  },
+  {
+    "id": 35,
+    "name": "Hilltop Cabin",
+    "location": "Mussoorie, Uttarakhand",
+    "price": 2000,
+    "amenities": ["WiFi", "Fireplace", "Mountain View"],
+    "description": "A cabin on the hilltops of Mussoorie."
+  },
+  {
+    "id": 36,
+    "name": "Urban Loft",
+    "location": "Noida, Uttar Pradesh",
+    "price": 2100,
+    "amenities": ["WiFi", "Gym", "City View"],
+    "description": "A stylish urban loft in the heart of Noida."
+  },
+  {
+    "id": 37,
+    "name": "Desert Oasis",
+    "location": "Bikaner, Rajasthan",
+    "price": 2300,
+    "amenities": ["WiFi", "Pool", "Desert View"],
+    "description": "An oasis resort in the deserts of Bikaner."
+  },
+  {
+    "id": 38,
+    "name": "Hilltop Villa",
+    "location": "Nainital, Uttarakhand",
+    "price": 2800,
+    "amenities": ["WiFi", "Garden", "Mountain View"],
+    "description": "A villa with stunning hilltop views in Nainital."
+  },
+  {
+    "id": 39,
+    "name": "Luxury Chalet",
+    "location": "Gulmarg, Jammu and Kashmir",
+    "price": 4000,
+    "amenities": ["WiFi", "Fireplace", "Ski Access"],
+    "description": "A luxury chalet with ski access in Gulmarg."
+  },
+  {
+    "id": 40,
+    "name": "Seaside Cottage",
+    "location": "Daman, Daman and Diu",
+    "price": 2500,
+    "amenities": ["WiFi", "Beach Access", "Sea View"],
+    "description": "A cottage by the sea in Daman."
+  },
+  {
+    "id": 41,
+    "name": "Forest Retreat",
+    "location": "Shimla, Himachal Pradesh",
+    "price": 1800,
+    "amenities": ["WiFi", "Fireplace", "Forest View"],
+    "description": "A retreat in the forested areas of Shimla."
+  },
+  {
+    "id": 42,
+    "name": "City Penthouse",
+    "location": "Delhi, Delhi",
+    "price": 5000,
+    "amenities": ["WiFi", "Pool", "City View"],
+    "description": "A penthouse with panoramic city views in Delhi."
+  },
+  {
+    "id": 43,
+    "name": "Heritage Villa",
+    "location": "Jaisalmer, Rajasthan",
+    "price": 2700,
+    "amenities": ["WiFi", "Garden", "Traditional Decor"],
+    "description": "A villa with heritage decor in Jaisalmer."
+  },
+  {
+    "id": 44,
+    "name": "Riverside Bungalow",
+    "location": "Rishikesh, Uttarakhand",
+    "price": 2200,
+    "amenities": ["WiFi", "River View", "Yoga Studio"],
+    "description": "A bungalow by the riverside in Rishikesh."
+  },
+  {
+    "id": 45,
+    "name": "Mountain Lodge",
+    "location": "Dalhousie, Himachal Pradesh",
+    "price": 2600,
+    "amenities": ["WiFi", "Fireplace", "Mountain View"],
+    "description": "A lodge with mountain views in Dalhousie."
+  },
+  {
+    "id": 46,
+    "name": "Beachfront Cabin",
+    "location": "Diu, Daman and Diu",
+    "price": 2700,
+    "amenities": ["WiFi", "Beach Access", "Sea View"],
+    "description": "A cabin right on the beachfront in Diu."
+  },
+  {
+    "id": 47,
+    "name": "City Apartment",
+    "location": "Lucknow, Uttar Pradesh",
+    "price": 1900,
+    "amenities": ["WiFi", "Gym", "City Center"],
+    "description": "An apartment in the city center of Lucknow."
+  },
+  {
+    "id": 48,
+    "name": "Desert Camp",
+    "location": "Jodhpur, Rajasthan",
+    "price": 1500,
+    "amenities": ["WiFi", "Camel Safari", "Cultural Shows"],
+    "description": "A camp in the deserts of Jodhpur."
+  },
+  {
+    "id": 49,
+    "name": "Hilltop House",
+    "location": "Shimla, Himachal Pradesh",
+    "price": 2400,
+    "amenities": ["WiFi", "Garden", "Mountain View"],
+    "description": "A house with hilltop views in Shimla."
+  },
+  {
+    "id": 50,
+    "name": "Luxury Villa",
+    "location": "Manali, Himachal Pradesh",
+    "price": 3500,
+    "amenities": ["WiFi", "Pool", "Mountain View"],
+    "description": "A luxury villa with mountain views in Manali."
+  }
+]

@@ -1,4 +1,4 @@
-import type { Property } from '@/lib/types/property';
+import type { Property, PropertyType } from '@/lib/types/property';
 
 // Simulate API delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -9,11 +9,14 @@ const mockProperties: Property[] = [
     id: '1',
     hostId: 'host1',
     title: 'Luxury Beach Villa',
-    description: 'Experience luxury living in this stunning beachfront villa with panoramic ocean views. Perfect for family gatherings or special occasions.',
-    location: 'Malibu, California',
+    description: 'Experience luxury living in this stunning beachfront villa with panoramic ocean views.',
+    location: {
+      address: 'Malibu, California',
+      latitude: 34.0259,
+      longitude: -118.7798
+    },
     price: 299,
     images: [
-      'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf',
       'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf',
       'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf'
     ],
@@ -30,11 +33,14 @@ const mockProperties: Property[] = [
     id: '2',
     hostId: 'host2',
     title: 'Mountain Retreat',
-    description: 'Escape to this cozy mountain retreat surrounded by nature. Perfect for those seeking peace and tranquility.',
-    location: 'Aspen, Colorado',
+    description: 'Escape to this cozy mountain retreat surrounded by nature.',
+    location: {
+      address: 'Aspen, Colorado',
+      latitude: 39.1911,
+      longitude: -106.8175
+    },
     price: 199,
     images: [
-      'https://images.unsplash.com/photo-1518780664697-55e3ad937233',
       'https://images.unsplash.com/photo-1518780664697-55e3ad937233',
       'https://images.unsplash.com/photo-1518780664697-55e3ad937233'
     ],
@@ -50,16 +56,19 @@ const mockProperties: Property[] = [
   {
     id: '3',
     hostId: 'host3',
-    title: 'Urban Loft',
-    description: 'Modern urban living at its finest. This stylish loft offers the perfect base for exploring the city.',
-    location: 'New York City',
-    price: 159,
+    title: 'Modern City Apartment',
+    description: 'Stylish apartment in the heart of downtown.',
+    location: {
+      address: 'New York, NY',
+      latitude: 40.7128,
+      longitude: -74.0060
+    },
+    price: 150,
     images: [
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688',
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688',
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688'
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267',
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267'
     ],
-    amenities: ['wifi', 'gym', 'ac'],
+    amenities: ['wifi', 'parking', 'gym'],
     maxGuests: 2,
     bedrooms: 1,
     bathrooms: 1,
@@ -70,12 +79,12 @@ const mockProperties: Property[] = [
   }
 ];
 
-export async function getFeaturedProperties(): Promise<Property[]> {
-  await delay(1500); // Simulate network delay
+export const getFeaturedProperties = async (): Promise<Property[]> => {
+  await delay(1000); // Simulate network delay
   return mockProperties;
-}
+};
 
-export async function getPropertyById(id: string): Promise<Property | undefined> {
-  await delay(1000);
-  return mockProperties.find(p => p.id === id);
-}
+export const getPropertyById = async (id: string): Promise<Property | undefined> => {
+  await delay(500);
+  return mockProperties.find(property => property.id === id);
+};

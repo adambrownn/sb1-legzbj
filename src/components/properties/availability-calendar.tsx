@@ -1,91 +1,71 @@
 import React from 'react';
-import { format, isWithinInterval, parse } from 'date-fns';
-import type { PropertyAvailability } from '@/lib/types/property';
+import type { PropertyAvailability } from '@/types/property';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
 
 interface AvailabilityCalendarProps {
   availability: PropertyAvailability[];
-  isHost?: boolean;
-  onDateSelect?: (date: Date) => void;
+  className?: string;
 }
 
-export function AvailabilityCalendar({
-  availability,
-  isHost = false,
-  onDateSelect,
-}: AvailabilityCalendarProps) {
-  const [currentMonth, setCurrentMonth] = React.useState(new Date());
+export function AvailabilityCalendar({ availability, className }: AvailabilityCalendarProps) {
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
 
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const firstDayOfMonth = new Date(year, month, 1).getDay();
-
-    return Array.from({ length: daysInMonth }, (_, i) => {
-      const day = i + 1;
-      const date = new Date(year, month, day);
-      const isBooked = availability.some((period) =>
-        isWithinInterval(date, {
-          start: parse(period.startDate, 'yyyy-MM-dd', new Date()),
-          end: parse(period.endDate, 'yyyy-MM-dd', new Date()),
-        })
-      );
-
-      return {
-        date,
-        isBooked,
-      };
-    });
+  const getDateStatus = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return availability.find(a => a.date === dateStr)?.status || 'available';
   };
 
-  const days = getDaysInMonth(currentMonth);
+  const getDatePrice = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return availability.find(a => a.date === dateStr)?.price;
+  };
 
   return (
-    <div className="rounded-lg border p-4">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-semibold">
-          {format(currentMonth, 'MMMM yyyy')}
-        </h3>
-        <div className="flex gap-2">
-          <button
-            onClick={() =>
-              setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)))
-            }
-            className="rounded-md p-1 hover:bg-gray-100"
-          >
-            Previous
-          </button>
-          <button
-            onClick={() =>
-              setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)))
-            }
-            className="rounded-md p-1 hover:bg-gray-100"
-          >
-            Next
-          </button>
+    <div className={cn('rounded-lg border', className)}>
+      <Calendar
+        mode="single"
+        selected={selectedDate}
+        onSelect={setSelectedDate}
+        className="rounded-md border"
+        modifiers={{
+          booked: (date) => getDateStatus(date) === 'booked',
+          partial: (date) => getDateStatus(date) === 'partial',
+          maintenance: (date) => getDateStatus(date) === 'maintenance',
+        }}
+        modifiersClassNames={{
+          booked: 'bg-red-100 text-red-900',
+          partial: 'bg-yellow-100 text-yellow-900',
+          maintenance: 'bg-gray-100 text-gray-900',
+        }}
+        components={{
+          DayContent: ({ date }) => (
+            <div className="flex flex-col items-center">
+              <span>{date.getDate()}</span>
+              <span className="text-xs font-medium">
+                ${getDatePrice(date)}
+              </span>
+            </div>
+          ),
+        }}
+      />
+      <div className="mt-2 flex flex-wrap gap-2 p-4 text-sm">
+        <div className="flex items-center gap-1">
+          <div className="h-3 w-3 rounded-full bg-green-100" />
+          <span>Available</span>
         </div>
-      </div>
-
-      <div className="grid grid-cols-7 gap-1">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-          <div key={day} className="text-center text-sm font-medium text-gray-500">
-            {day}
-          </div>
-        ))}
-        {days.map(({ date, isBooked }) => (
-          <button
-            key={date.toISOString()}
-            onClick={() => onDateSelect?.(date)}
-            disabled={!isHost && isBooked}
-            className={`aspect-square rounded-md p-2 text-sm ${
-              isBooked
-                ? 'bg-red-100 text-red-800'
-                : 'hover:bg-blue-100 hover:text-blue-800'
-            }`}
-          >
-            {format(date, 'd')}
-          </button>
-        ))}
+        <div className="flex items-center gap-1">
+          <div className="h-3 w-3 rounded-full bg-red-100" />
+          <span>Booked</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="h-3 w-3 rounded-full bg-yellow-100" />
+          <span>Partial</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="h-3 w-3 rounded-full bg-gray-100" />
+          <span>Maintenance</span>
+        </div>
       </div>
     </div>
   );

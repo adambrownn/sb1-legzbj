@@ -10,6 +10,37 @@ import {
 } from 'recharts';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import { useBookingStore } from '@/lib/store/booking-store';
+import { saveAs } from 'file-saver';
+
+const exportToCSV = (data: any[], filename: string) => {
+  const csvContent = [
+    ['Date', 'Bookings', 'Revenue'],
+    ...data.map((row) => [row.date, row.bookings, row.revenue]),
+  ]
+    .map((e) => e.join(','))
+    .join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  saveAs(blob, filename);
+};
+
+const exportToPDF = async (data: any[], filename: string) => {
+  const { jsPDF } = await import('jspdf');
+  const doc = new jsPDF();
+
+  doc.text('Monthly Booking Analytics', 10, 10);
+
+  const tableColumn = ['Date', 'Bookings', 'Revenue'];
+  const tableRows: any[] = [];
+
+  data.forEach((row) => {
+    const rowData = [row.date, row.bookings.toString(), row.revenue.toString()];
+    tableRows.push(rowData);
+  });
+
+  doc.autoTable(tableColumn, tableRows, { startY: 20 });
+  doc.save(filename);
+};
 
 export function BookingAnalytics() {
   const bookings = useBookingStore((state) => state.bookings);
@@ -50,6 +81,20 @@ export function BookingAnalytics() {
             <Bar yAxisId="right" dataKey="revenue" fill="#10b981" name="Revenue ($)" />
           </BarChart>
         </ResponsiveContainer>
+      </div>
+      <div className="mt-4 flex gap-2">
+        <button
+          onClick={() => exportToCSV(data, 'booking-analytics.csv')}
+          className="px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          Export to CSV
+        </button>
+        <button
+          onClick={() => exportToPDF(data, 'booking-analytics.pdf')}
+          className="px-4 py-2 bg-green-500 text-white rounded"
+        >
+          Export to PDF
+        </button>
       </div>
     </div>
   );
